@@ -14,6 +14,7 @@ class App extends React.Component {
         this.state = {
             robots: [],
             searchfield: '',
+            date: Date(),
         }
     }
 
@@ -49,7 +50,9 @@ class App extends React.Component {
                     <SearchBox searchChange={this.onSearchChange}/>
                     <Scroll>
                         <ErrorBoundary>
-                            <CardList robots={filteredRobots} />
+                            <CardList 
+                                robots={filteredRobots}
+                                date={this.state.date}/>
                         </ErrorBoundary>
                     </Scroll>
                 </div>
