@@ -1,35 +1,42 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
-// import { robots } from './robots';
 import Scroll from '../components/Scroll'
 import ErrorBoundary from '../components/ErrorBoundary'
 import './App.css';
+import { setSearchField, requestRobots } from '../actions.js'
 
 
 
-function App() {
-    const [robots, setRobots] = useState([])
-    const [searchfield, setSearchfield] = useState('')
+
+
+const App = () => {
+
+    const dispatch = useDispatch()
+    const { searchField } = useSelector(state => state.searchRobots)
+    const { robots, isPending, error } = useSelector(state => state.requestRobots)
     const [date,] = useState(Date())
 
+
+
     const onSearchChange = (event) => {
-        setSearchfield(event.target.value)
+        dispatch(setSearchField(event.target.value))
+    }
+
+    const onRequestRobots = () => {
+        dispatch(requestRobots())
     }
 
     useEffect(() => {
-        fetch('https://jsonplaceholder.typicode.com/users')
-            .then(response => response.json())
-            .then(users => setRobots(users));
+        onRequestRobots()
     }, [])
 
-
     const filteredRobots = robots.filter(robot => {
-        return robot.name.toLowerCase().includes(searchfield.toLowerCase())
-
+        return robot.name.toLowerCase().includes(searchField.toLowerCase())
     })
 
-    if (!robots.length) {
+    if (isPending) {
         return (
             <div className='tc'>
                 <h1 className='f2'>Robofriends</h1>
@@ -37,7 +44,8 @@ function App() {
                 <h1 className='f3'>Loading...</h1>
             </div>
         )
-    } else {
+    }
+    else if (!error) {
         return (
             <div className='tc'>
                 <h1 className='f1'>Robofriends</h1>
@@ -51,6 +59,15 @@ function App() {
                 </Scroll>
             </div>
         );
+    }
+    else {
+        return (
+            <div className='tc'>
+                <h1 className='f2'>Robofriends</h1>
+                <SearchBox searchChange={onSearchChange} />
+                <h1 className='f3'>Error...</h1>
+            </div>
+        )
     }
 }
 
